@@ -1,0 +1,54 @@
+# Dependencies
+node_modules
+npm-debug.log
+pnpm-debug.log
+yarn-error.log
+
+# Build outputs
+dist
+build
+.next
+out
+
+# Development files
+.env.local
+.env.*.local
+*.log
+logs
+*.tsbuildinfo
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+README.md
+*.md
+docs
+
+# Testing
+coverage
+.nyc_output
+*.test.ts
+*.spec.ts
+
+# Misc
+.turbo
+.eslintcache
