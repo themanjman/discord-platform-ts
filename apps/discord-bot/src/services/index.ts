@@ -24,4 +24,5 @@ export { ErrorHandlerService } from './error-handler.service';
 export { EventLoader } from './eventloader.service';
 export { EventRegistry } from './eventregistry.service';
 export { LoggerService } from './logger.service';
+export { ModLogService, type ModLogEntry, type ModLogField } from './mod-log.service';
 export { StartupService } from './startup.service';

@@ -48,6 +48,10 @@ next-env.d.ts
 logs/
 *.log
 
+# Guild config persistence
+apps/discord-bot/data/*
+!apps/discord-bot/data/.gitkeep
+
 # Development tools
 .cursor/
 .plans/

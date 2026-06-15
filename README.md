@@ -22,7 +22,7 @@ discord-platform-ts/
 │       │   ├── factories/  # Factory classes for DI
 │       │   ├── middleware/ # Request middleware
 │       │   ├── registries/ # Command and interaction registries
-│       │   ├── repositories/# Data repositories (future)
+│       │   ├── repositories/# Guild config repositories (JSON persistence)
 │       │   ├── services/   # Business logic services
 │       │   ├── types/      # TypeScript type definitions
 │       │   ├── utils/      # Utility functions
@@ -441,9 +441,65 @@ const disableAllPrefixCommandsInline: boolean = true;
 4. **Set proper file permissions** (600 for `.env` files)
 5. **Limit container resources** if needed (CPU, memory limits)
 
+### Guild Config Persistence
+
+The framework includes a generic JSON repository for per-guild configuration files.
+
+- **Storage path:** `{DATA_DIR}/guild-{GUILD_ID}.json` (default `apps/discord-bot/data/` when running locally)
+- **Configure via env:** `DATA_DIR=data` (relative to process cwd) or an absolute path
+- **Docker volume:** `./apps/discord-bot/data` is mounted in `docker-compose.yml`
+
+**Usage in an app:**
+
+```typescript
+import { createJsonGuildConfigRepository } from '@/repositories';
+import { BotConfig } from '@/config';
+import { LoggerService } from '@/services';
+
+interface MyGuildConfig {
+  featureEnabled: boolean;
+}
+
+const repo = createJsonGuildConfigRepository<MyGuildConfig>(
+  {
+    dataDir: config.dataDir,
+    guildId: config.guildId!,
+    defaultConfig: { featureEnabled: false },
+  },
+  logger,
+);
+
+repo.update(current => ({ ...current, featureEnabled: true }));
+```
+
+Wrap the repository in an app-level `@singleton()` service for domain methods (`isProtected`, etc.).
+
+### Mod Log Service
+
+`ModLogService` posts structured embeds to a configured text channel. Inject it and call `send(client, logChannelId, entry)` from event handlers or services.
+
+```typescript
+await modLogService.send(client, logChannelId, {
+  title: 'Moderation action',
+  color: 0xff0000,
+  fields: [
+    { name: 'User', value: `<@${userId}>`, inline: true },
+    { name: 'Action', value: 'Ban', inline: true },
+  ],
+});
+```
+
+If the log channel is unset or unreachable, the entry is written to Winston instead.
+
+### Permission Utilities
+
+`isGuildOwner(member, guild)` and `hasAdministrator(member)` in `@/utils` are for runtime checks in event handlers. Slash commands should continue to use `defaultMemberPermissions` on the decorator.
+
 ## Recent Changes
 
-- **Command Disabling System**: Added flexible command disabling configuration
+- **Guild Config Persistence**: Added `JsonGuildConfigRepository`, `IGuildConfigRepository`, and `BotConfig.dataDir` for typed per-guild JSON storage
+- **Mod Log Service**: Added `ModLogService` for structured moderation embeds with Winston fallback
+- **Permission Utilities**: Added `isGuildOwner` and `hasAdministrator` helpers for event-handler checks
   - Disable individual commands via arrays in `bot.config.ts` or environment variables
   - Disable all slash or prefix commands with boolean flags
   - Disabled commands are excluded from registration, help listings, and return friendly messages when attempted

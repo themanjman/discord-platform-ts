@@ -19,9 +19,12 @@ services:
       - GUILD_ID=${GUILD_ID:-}
       - CLIENT_ID=${CLIENT_ID:-}
       - SUPPORT_URL=${SUPPORT_URL:-}
+      - DATA_DIR=${DATA_DIR:-data}
     volumes:
       # Persist logs outside container
       - ./apps/discord-bot/logs:/app/apps/discord-bot/logs
+      # Persist guild config JSON outside container
+      - ./apps/discord-bot/data:/app/apps/discord-bot/data
     networks:
       - discord-bot-network
 

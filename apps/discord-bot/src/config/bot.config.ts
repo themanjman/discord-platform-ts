@@ -1,3 +1,5 @@
+import { resolve } from 'path';
+
 import { singleton } from 'tsyringe';
 import dotenv from 'dotenv';
 
@@ -19,6 +21,7 @@ dotenv.config();
  * @property {ReadonlySet<string>} disabledPrefixCommands Set of disabled prefix command names.
  * @property {boolean} disableAllSlashCommands If true, all slash commands are disabled.
  * @property {boolean} disableAllPrefixCommands If true, all prefix commands are disabled.
+ * @property {string} dataDir Absolute path for guild-scoped JSON persistence.
  */
 export interface IBotConfig {
 	readonly discordToken: string;
@@ -33,6 +36,7 @@ export interface IBotConfig {
 	readonly disabledPrefixCommands: ReadonlySet<string>;
 	readonly disableAllSlashCommands: boolean;
 	readonly disableAllPrefixCommands: boolean;
+	readonly dataDir: string;
 }
 
 /**
@@ -82,6 +86,9 @@ export class BotConfig implements IBotConfig {
 	/** If true, all prefix commands are disabled regardless of individual settings. */
 	public readonly disableAllPrefixCommands: boolean;
 
+	/** Absolute path for guild-scoped JSON persistence. */
+	public readonly dataDir: string;
+
 	/**
 	 * Constructs and validates the bot config, reading required and optional settings from process.env.
 	 * Throws if authentication token is missing to protect application from invalid state.
@@ -95,6 +102,7 @@ export class BotConfig implements IBotConfig {
 		const logProvider: string | undefined = process.env.LOG_PROVIDER;
 		const guildId: string | undefined = process.env.GUILD_ID;
 		const supportURL: string | undefined = process.env.SUPPORT_URL;
+		const dataDirRaw: string = process.env.DATA_DIR || 'data';
 
 		if (!discordToken) {
 			throw new Error('DISCORD_TOKEN environment variable is required but not set');
@@ -108,6 +116,7 @@ export class BotConfig implements IBotConfig {
 		this.logProvider = logProvider || 'winston';
 		this.guildId = guildId;
 		this.supportURL = supportURL;
+		this.dataDir = resolve(process.cwd(), dataDirRaw);
 
 		// Disabled commands configuration
 		// Add command names here to disable them (they won't appear in help/info and will return 404 if executed)
