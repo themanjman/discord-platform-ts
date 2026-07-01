@@ -430,8 +430,9 @@ const disableAllPrefixCommandsInline: boolean = true;
 **Behavior:**
 - Disabled commands won't be registered with Discord (slash commands won't appear in Discord's command list)
 - Disabled commands won't appear in help/info listings
-- Users attempting to use disabled commands will receive: "This command is currently unavailable."
-- If all commands of a type are disabled, users will receive: "Slash commands are currently unavailable." or "Prefix commands are currently unavailable."
+- Users attempting to use individually disabled commands will receive: "This command is currently unavailable."
+- If all slash commands are disabled, users will receive: "Slash commands are currently unavailable."
+- If all prefix commands are disabled, the bot does not register `MessageEventHandler` and never processes prefixed messages (avoids conflicting with other bots sharing the same prefix).
 
 ### Security Best Practices
 

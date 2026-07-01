@@ -116,7 +116,7 @@ export class BotService {
 	 */
 	private registerControllers(): void {
 		this._logger.debug('BotService', 'Registering command controllers...');
-		
+
 		this._slashCommandRegistry.register(_slashControllers);
 		this._logger.info('BotService', `Registered ${_slashControllers.length} slash command(s)`, {
 			commandCount: _slashControllers.length,
@@ -139,12 +139,20 @@ export class BotService {
 	 */
 	private loadEventHandlers(): void {
 		this._logger.debug('BotService', 'Loading event handlers...');
-		this._eventLoader.loadEventHandlers([
-			InteractionEventHandler,
-			MessageEventHandler,
-		]);
+		const handlers: Array<
+			typeof InteractionEventHandler | typeof MessageEventHandler
+		> = [InteractionEventHandler];
+
+		if (!this._config.disableAllPrefixCommands) {
+			handlers.push(MessageEventHandler);
+		}
+		else {
+			this._logger.info('BotService', 'Prefix commands disabled, skipping MessageEventHandler');
+		}
+
+		this._eventLoader.loadEventHandlers(handlers);
 		this._logger.debug('BotService', 'Event handlers loaded', {
-			handlerCount: 2,
+			handlerCount: handlers.length,
 		});
 	}
 
@@ -175,7 +183,7 @@ export class BotService {
 			}
 			await this._slashCommandRegistry.executeCommand(
 				interaction.commandName,
-				interaction
+				interaction,
 			);
 		});
 
@@ -245,10 +253,12 @@ export class BotService {
 				const metadata = getSlashCommandMetadata(ControllerClass);
 				if (metadata?.options.guildOnly) {
 					guildOnlyCommands.push(cmd);
-				} else {
+				}
+				else {
 					globalCommands.push(cmd);
 				}
-			} else {
+			}
+			else {
 				globalCommands.push(cmd);
 			}
 		}
@@ -259,7 +269,8 @@ export class BotService {
 					commandCount: guildOnlyCommands.length,
 					commandNames: guildOnlyCommands.map(cmd => cmd.name),
 				});
-			} else {
+			}
+			else {
 				try {
 					this._logger.info('BotService', `Registering ${guildOnlyCommands.length} guild-only slash command(s) for guild ${guildId}...`, {
 						commandCount: guildOnlyCommands.length,
@@ -277,7 +288,8 @@ export class BotService {
 						commandCount: guildOnlyCommands.length,
 						guildId,
 					});
-				} catch (error) {
+				}
+				catch (error) {
 					this._logger.error('BotService', `Failed to register guild-only slash commands for guild ${guildId}`, error instanceof Error ? error : new Error(String(error)), {
 						commandCount: guildOnlyCommands.length,
 						guildId,
@@ -303,7 +315,8 @@ export class BotService {
 				this._logger.info('BotService', `Successfully registered ${globalCommands.length} global slash command(s)`, {
 					commandCount: globalCommands.length,
 				});
-			} catch (error) {
+			}
+			catch (error) {
 				this._logger.error('BotService', 'Failed to register global slash commands', error instanceof Error ? error : new Error(String(error)), {
 					commandCount: globalCommands.length,
 					clientId,

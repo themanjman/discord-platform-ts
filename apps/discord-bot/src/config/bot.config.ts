@@ -42,10 +42,10 @@ export interface IBotConfig {
 /**
  * Provides type-safe, validated and immutable access to bot configuration sourced from environment variables.
  * Ensures that all required values are present and exposes settings as readonly properties.
- * 
+ *
  * @class
  * @implements {IBotConfig}
- * 
+ *
  * @throws {Error} If the required DISCORD_TOKEN environment variable is not defined.
  */
 @singleton()
@@ -138,16 +138,18 @@ export class BotConfig implements IBotConfig {
 		// Disable all commands flags
 		// Set to true here to disable ALL slash or prefix commands
 		// Can also be set via environment variables: DISABLE_ALL_SLASH_COMMANDS=true or DISABLE_ALL_PREFIX_COMMANDS=true
-		const disableAllSlashCommandsInline: boolean = false; // Set to true here to disable all slash commands
-		const disableAllPrefixCommandsInline: boolean = false; // Set to true here to disable all prefix commands
+		// disableAllSlashCommandsInline: set to true to disable all slash commands
+		// disableAllPrefixCommandsInline: set to true to disable all prefix commands
+		const disableAllSlashCommandsInline: boolean = false;
+		const disableAllPrefixCommandsInline: boolean = false;
 
-		const disableAllSlashCommands: boolean = 
-			process.env.DISABLE_ALL_SLASH_COMMANDS === 'true' || 
+		const disableAllSlashCommands: boolean =
+			process.env.DISABLE_ALL_SLASH_COMMANDS === 'true' ||
 			process.env.DISABLE_ALL_SLASH_COMMANDS === '1' ||
 			disableAllSlashCommandsInline;
 
-		const disableAllPrefixCommands: boolean = 
-			process.env.DISABLE_ALL_PREFIX_COMMANDS === 'true' || 
+		const disableAllPrefixCommands: boolean =
+			process.env.DISABLE_ALL_PREFIX_COMMANDS === 'true' ||
 			process.env.DISABLE_ALL_PREFIX_COMMANDS === '1' ||
 			disableAllPrefixCommandsInline;
 

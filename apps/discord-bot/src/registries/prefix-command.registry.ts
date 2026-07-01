@@ -187,7 +187,6 @@ export class PrefixCommandRegistry {
 		// Check if all prefix commands are disabled
 		if (this._config.disableAllPrefixCommands) {
 			this._logger.debug('PrefixRegistry', 'All prefix commands are disabled');
-			await message.reply('Prefix commands are currently unavailable.');
 			return;
 		}
 
@@ -233,7 +232,8 @@ export class PrefixCommandRegistry {
 		try {
 			await controller.execute(message, _args);
 			this._logger.debug('PrefixRegistry', `Command executed successfully: ${name}`);
-		} catch (error) {
+		}
+		catch (error) {
 			await this.handleExecutionError(error, message, name);
 		}
 	}
@@ -299,7 +299,7 @@ export class PrefixCommandRegistry {
 	 * Validates whether the user has the required roles to execute the command.
 	 * Uses OR logic: the user must have ANY of the specified roles.
 	 * Sends a reply and returns false if the user lacks required roles.
-	 * 
+	 *
 	 * @param name The canonical command name.
 	 * @param message The Discord message invoking the command.
 	 * @param ControllerClass The controller class for metadata lookup.
@@ -345,10 +345,10 @@ export class PrefixCommandRegistry {
 
 		// Fetch the member to check their roles
 		const member = await message.guild.members.fetch(message.author.id);
-		
+
 		// OR logic: user needs ANY of the required roles
-		const hasRequiredRole = allRequiredRoleIds.some(roleId => 
-			member.roles.cache.has(roleId)
+		const hasRequiredRole = allRequiredRoleIds.some(roleId =>
+			member.roles.cache.has(roleId),
 		);
 
 		if (!hasRequiredRole) {
